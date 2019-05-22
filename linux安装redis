@@ -1,0 +1,89 @@
+第一步：下载redis安装包
+wget http://download.redis.io/releases/redis-4.0.6.tar.gz
+
+
+第二步：解压压缩包
+tar -zxvf redis-4.0.6.tar.gz
+
+
+第三步：yum安装gcc依赖
+yum install gcc
+
+
+第四步：跳转到redis解压目录下
+cd redis-4.0.6
+
+
+第五步：编译安装
+make MALLOC=libc　　
+
+将/usr/local/redis-4.0.6/src目录下的文件加到/usr/local/bin目录
+cd src && make install
+
+
+第六步：测试是否安装成功 
+
+先切换到redis src目录下
+cd src
+直接启动
+./redis-server
+
+
+
+
+2、以后台进程方式启动redis
+
+第一步：修改redis.conf文件
+
+将daemonize no修改为daemonize yes
+
+第二步：指定redis.conf文件启动
+./redis-server /usr/local/redis-4.0.6/redis.conf
+
+第三步：关闭redis进程
+首先使用ps -aux | grep redis查看redis进程     kill -9 18714
+
+第七步：设置redis开机自启动
+
+1、在/etc目录下新建redis目录
+mkdir redis
+
+2、将/usr/local/redis-4.0.6/redis.conf 文件复制一份到/etc/redis目录下，并命名为6379.conf
+cp /usr/local/redis-4.0.6/redis.conf /etc/redis/6379.conf
+
+3、将redis的启动脚本复制一份放到/etc/init.d目录下
+cp /usr/local/redis-4.0.6/utils/redis_init_script /etc/init.d/redisd
+
+4、设置redis开机自启动
+先切换到/etc/init.d目录下，然后执行自启命令
+chkconfig redisd on
+service redisd does not support chkconfig　
+
+看结果是redisd不支持chkconfig
+
+解决方法：
+
+使用vim编辑redisd文件，在第一行加入如下两行注释，保存退出
+# chkconfig:   2345 90 10
+# description:  Redis is a persistent key-value database
+
+再次执行开机自启命令，成功
+chkconfig redisd on
+
+现在可以直接已服务的形式启动和关闭redis了
+启动：
+service redisd start　　
+关闭：
+service redisd stop
+
+
+
+
+
+redis端口被占用无法启动
+1.找到改进程
+ps -ef | grep -i redis
+2.杀死该进程
+kill -9 3086  
+3.重启redis
+./redis-server  
