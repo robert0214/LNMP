@@ -1,0 +1,35 @@
+1 下载并安装MySQL官方的 Yum Repository
+[root@localhost ~]# wget -i -c http://dev.mysql.com/get/mysql57-community-release-el7-10.noarch.rpm
+
+使用上面的命令就直接下载了安装用的Yum Repository，大概25KB的样子，然后就可以直接yum安装了。
+[root@localhost ~]# yum -y install mysql57-community-release-el7-10.noarch.rpm
+
+之后就开始安装MySQL服务器。
+[root@localhost ~]# yum -y install mysql-community-server
+
+
+2 MySQL数据库设置
+首先启动MySQL
+[root@localhost ~]# systemctl start mysqld.service
+
+
+查看MySQL运行状态：
+[root@localhost ~]# systemctl status mysqld.service
+
+
+通过如下命令可以在日志文件中找出密码：
+[root@localhost ~]# grep "password" /var/log/mysqld.log
+
+如下命令进入数据库：
+[root@localhost ~]# mysql -uroot -p
+
+
+新密码设置的时候如果设置的过于简单会报错，原因是因为MySQL有密码设置的规范
+mysql> set global validate_password_policy=0;
+mysql> set global validate_password_length=1;
+此时密码就可以设置的很简单，例如1234之类的。
+
+但此时还有一个问题，就是因为安装了Yum Repository，以后每次yum操作都会自动更新，需要把这个卸载掉：
+[root@localhost ~]# yum -y remove mysql57-community-release-el7-10.noarch
+
+ 
