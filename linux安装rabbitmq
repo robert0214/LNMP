@@ -1,0 +1,53 @@
+rabbitmq配置
+
+1.先安装erlang：
+rpm -Uvh http://download.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-8.noarch.rpm
+yum install erlang
+
+2.安装rabbitmq：
+先下载rpm： wget http://www.rabbitmq.com/releases/rabbitmq-server/v3.6.6/rabbitmq-server-3.6.6-1.el7.noarch.rpm
+下载完成后安装：yum install rabbitmq-server-3.6.6-1.el7.noarch.rpm 
+
+3.完成后启动服务：
+service rabbitmq-server start
+
+4.可以查看服务状态：
+service rabbitmq-server status 
+
+  
+
+查看log文件：/var/log/rabbitmq/rabbit@localhost.log
+这里显示的是没有找到配置文件，我们可以自己创建这个文件
+
+cd /etc/rabbitmq/
+vi rabbitmq.config
+编辑内容如下：
+
+[{rabbit, [{loopback_users, []}]}].
+这里的意思是开放使用，rabbitmq默认创建的用户guest，密码也是guest，这个用户默认只能是本机访问，localhost或者127.0.0.1，从外部访问需要添加上面的配置。
+
+保存配置后重启服务：
+
+service rabbitmq-server stop
+service rabbitmq-server start
+此时就可以从外部访问了，但此时再看log文件，发现内容还是原来的，还是显示没有找到配置文件，可以手动删除这个文件再重启服务，不过这不影响使用
+
+rm rabbit\@mythsky.log 
+service rabbitmq-server stop
+service rabbitmq-server start
+
+
+开放5672端口：
+firewall-cmd --zone=public --add-port=5672/tcp --permanent
+firewall-cmd --reload 
+
+
+开启管理UI：
+rabbitmq-plugins enable rabbitmq_management
+firewall-cmd --zone=public --add-port=15672/tcp --permanent
+firewall-cmd --reload
+
+
+
+安装rabbitmq php扩展
+查看安装的amqp：php --ri amqp
