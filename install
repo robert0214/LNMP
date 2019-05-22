@@ -1,0 +1,158 @@
+下载php7
+wget -O php7.tar.gz http://cn2.php.net/get/php-7.1.1.tar.gz/from/this/mirror
+
+解压php7
+tar -xvf php7.tar.gz
+
+进入php目录
+cd php-7.1.1
+
+
+1、安装php的安装依赖包
+yum install libxml2 libxml2-devel openssl openssl-devel bzip2 bzip2-devel libcurl libcurl-devel 
+libjpeg libjpeg-devel libpng libpng-devel freetype freetype-devel gmp gmp-devel libmcrypt libmcrypt-devel 
+readline readline-devel libxslt libxslt-devel
+
+2、安装php扩展
+./configure \
+--prefix=/usr/local/php \
+--with-config-file-path=/etc \
+--enable-fpm \
+--with-fpm-user=nginx \
+--with-fpm-group=nginx \
+--enable-inline-optimization \
+--disable-debug \
+--disable-rpath \
+--enable-shared \
+--enable-soap \
+--with-libxml-dir \
+--with-xmlrpc \
+--with-openssl \
+--with-mcrypt \
+--with-mhash \
+--with-pcre-regex \
+--with-sqlite3 \
+--with-zlib \
+--enable-bcmath \
+--with-iconv \
+--with-bz2 \
+--enable-calendar \
+--with-curl \
+--with-cdb \
+--enable-dom \
+--enable-exif \
+--enable-fileinfo \
+--enable-filter \
+--with-pcre-dir \
+--enable-ftp \
+--with-gd \
+--with-openssl-dir \
+--with-jpeg-dir \
+--with-png-dir \
+--with-zlib-dir \
+--with-freetype-dir \
+--enable-gd-native-ttf \
+--enable-gd-jis-conv \
+--with-gettext \
+--with-gmp \
+--with-mhash \
+--enable-json \
+--enable-mbstring \
+--enable-mbregex \
+--enable-mbregex-backtrack \
+--with-libmbfl \
+--with-onig \
+--enable-pdo \
+--with-mysqli=mysqlnd \
+--with-pdo-mysql=mysqlnd \
+--with-zlib-dir \
+--with-pdo-sqlite \
+--with-readline \
+--enable-session \
+--enable-shmop \
+--enable-simplexml \
+--enable-sockets \
+--enable-sysvmsg \
+--enable-sysvsem \
+--enable-sysvshm \
+--enable-wddx \
+--with-libxml-dir \
+--with-xsl \
+--enable-zip \
+--enable-mysqlnd-compression-support \
+--with-pear \
+--enable-opcache
+
+
+3、编译安装php
+make && make install
+
+4、环境变量
+vi /etc/profile
+
+最后一行加入一下内容
+PATH=$PATH:/usr/local/php/bin
+export PATH
+
+执行命令使得改动立即生效 
+source /etc/profile
+
+5.配置php-fpm
+cp php.ini-production /etc/php.ini
+cp /usr/local/php/etc/php-fpm.conf.default /usr/local/php/etc/php-fpm.conf
+cp /usr/local/php/etc/php-fpm.d/www.conf.default /usr/local/php/etc/php-fpm.d/www.conf
+cp sapi/fpm/init.d.php-fpm /etc/init.d/php-fpm
+chmod +x /etc/init.d/php-fpm
+
+6.启动php-fpm
+/etc/init.d/php-fpm start
+
+
+6.按装过程错误信息解决方案
+报错信息为：
+configure: error: off_t undefined; check your library configuration
+
+
+在编译php时会遇到如上问题，这个问题一般在centos 64位系统中比较多见，解决如下
+
+echo '/usr/local/lib64
+/usr/local/lib
+/usr/lib
+/usr/lib64'>>/etc/ld.so.conf&&ldconfig -v
+
+
+configure: error: mcrypt.h not found. Please reinstall libmcrypt.
+#使用wget可以通过以下路径下载  
+wget ftp://mcrypt.hellug.gr/pub/crypto/mcrypt/attic/libmcrypt/libmcrypt-2.5.7.tar.gz  
+   
+#解压  
+tar -zxvf libmcrypt-2.5.7.tar.gz   
+   
+#进入目录  
+cd libmcrypt-2.5.7  
+   
+#编译（默认安装到/usr/local/lib/）  
+./configure
+   
+#执行安装  
+make && make install  
+
+
+
+报错信息为：
+configure: error: off_t undefined; check your library configuration
+
+
+在编译php时会遇到如上问题，这个问题一般在centos 64位系统中比较多见，解决如下
+
+echo '/usr/local/lib64
+/usr/local/lib
+/usr/lib
+/usr/lib64'>>/etc/ld.so.conf&&ldconfig -v
+
+
+centos7 安装php7,报错cannot get uid for user nginx
+解决：/usr/local/php/etc/php-fpm.d/www.conf文件，对其中user=nginx和group=nginx
+
+
+php配置文件：/etc/php.ini
