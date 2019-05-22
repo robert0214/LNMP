@@ -1,0 +1,108 @@
+samba是个文件共享服务器。在linux和windows之间很好用，当然有更好的是NFS。这里对自己在CentOS7上安装samba的过程做一个记录。
+因为发现网上的都很乱，自己踩过坑以后，记录下，以便以后不再踩了。当然，你也可以去看《鸟哥的linux私房菜-服务器搭建篇》，上面都介绍
+的很好。
+1、关闭防火墙。
+    CentOS 7 是自带的firewall，CentOS 6 好像是iptables。关闭防火墙命令如下：
+     第一种方法是关闭防火墙：
+
+        systemctl disable firewalld.service
+    第二种方法是添加规则：
+
+        firewall-cmd --permanent --zone=public --add-service=samba
+        firewall-cmd --reload
+2、关闭selinux
+
+    vim /etc/selinux/config
+    设置：SELINUX=disabled
+
+
+
+
+Centos7配置文件共享服务器SAMBA三步曲
+
+1、安装
+
+yum install samba samba-client samba-common -y
+2、配置
+
+备份已有配置
+mv /etc/samba/smb.conf /etc/samba/smb.conf.bkp
+
+配置文件：
+# See smb.conf.example for a more detailed config file or
+# read the smb.conf manpage.
+# Run 'testparm' to verify the config is correct after
+# you modified it.
+
+[global]
+	workgroup = WORKGROUP
+	security = user
+	server string = Samba Server %v
+	;passdb backend  = tdbsam
+        passdb backend  =  smbpasswd	
+         printing = cups
+         encrypt passwords = true
+	printcap name = cups
+	load printers = yes
+	cups options = raw
+        netbios name = centos
+	#map to guest = bad user
+	dns proxy = no
+
+[homes]
+	comment = Home Directories
+	valid users = %S, %D%w%S
+	browseable = no
+	writable = yes
+	read only = No
+	inherit acls = Yes
+
+[printers]
+    comment = All Printers
+    path = /var/tmp
+    printable = Yes
+    create mask = 0600
+    browseable = No
+
+[print$]
+	comment = Printer Drivers
+	path = /var/lib/samba/drivers
+        write list = root
+	create mask = 0755
+	directory mask = 0755
+
+[Public]
+    path = /data/share
+    writable = yes
+    browsable = yes
+    guest ok = no
+    create mode = 0755
+    directory mode = 0755
+    read only = no
+    public = yes
+    valid users = root
+
+
+注意：在samba4中 share 和 server已经被禁用，需要用 security = user 和map to guest =Bad User来实现无密码访问目录
+
+
+配置启动服务
+mkdir -p /data/share/public
+systemctl enable smb.service
+systemctl enable nmb.service
+systemctl restart smb.service
+systemctl restart nmb.service
+
+
+设置防火墙
+firewall-cmd --permanent --zone=public --add-service=samba
+firewall-cmd --reload
+修改目录访问权限 
+chmod -R 0755 public
+chown -R nobody:nobody public
+
+
+若使用用户名和密码登陆访问共享文件夹
+添加smb用户
+adduser smbuer
+smbpasswd  -a smbuer
