@@ -1,0 +1,50 @@
+yum安装svn服务器
+yum -y install subversion
+
+1，建立版本库目录，其实就是创建一个目录
+#mkdir /xxx/xxx   目录路径可以随便取 本例子使用目录/data/svn
+
+2，创建一个新的Subversion项目
+
+#svnadmin create /data/svn
+
+3，配置svn
+#cd /data/svn/conf 
+
+#vim /data/svn/conf/authz
+[/]
+* = rw
+##在文件末尾加入两行
+
+#vim /data/svn/conf/passwd
+ll = o0x&7vceTi8W
+guming = e8S[iDin5i4q
+
+###添加用户一行一个
+
+#vim /data/svn/conf/svnserve.conf
+# anon-access = read
+# auth-access = write
+这两行把#注释去掉，变成以下两行(read变成none)
+anon-access = none
+auth-access = write
+
+# password-db = passwd
+# authz-db = authz
+###找到这两行，把#注释都去掉，变成一下两行
+password-db = passwd
+authz-db = authz
+
+启动svn服务
+svnserve -d -r /data/svn/ --listen-port=1111
+
+-d 后台运行 -r指定项目目录 --listen-port 端口随便取
+
+ps aux | grep svn
+
+查看服务是否运行
+
+重启svn操作
+1，ps aux | grep svn  找到root后面的PID号
+2，kill -9 PID号
+3，svnserve -d -r /data/svn/ --listen-port=1111
