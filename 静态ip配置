@@ -1,0 +1,27 @@
+1：vmware 虚拟机-镜像centos7以上
+2:php7+mysql+redis+rabbitmq+nginx
+3:共享 samba
+
+虚拟机配置静态ip
+
+TYPE=Ethernet
+PROXY_METHOD=none
+BROWSER_ONLY=no
+BOOTPROTO=static
+DEFROUTE=yes
+IPV4_FAILURE_FATAL=no
+IPV6INIT=yes
+IPV6_AUTOCONF=yes
+IPV6_DEFROUTE=yes
+IPV6_FAILURE_FATAL=no
+IPV6_ADDR_GEN_MODE=stable-privacy
+NAME=ens33
+UUID=365c46a7-d4b7-4d5e-84de-49f95e920c14
+DEVICE=ens33
+IPADDR=192.168.24.100
+DNS1=192.168.24.2
+GATEWAY=192.168.24.2
+NETMASK=255.255.255.0
+ONBOOT=yes
+ZONE=public
+
